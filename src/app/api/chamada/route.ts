@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import sql from "@/lib/db";
 import type { Chamada, ChamadaPresenca } from "@/lib/types";
+import type { Sql } from "postgres";
 
 // GET /api/chamada?professorId=xxx
 export async function GET(request: NextRequest) {
@@ -81,14 +82,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Insere chamada e presenças em transação
-    await sql.begin(async (tx) => {
+    await sql.begin(async (tx: Sql) => {
       const [chamada] = await tx`
         INSERT INTO chamadas
           (professor_id, turma_id, cronograma_id, data_aula, horario_inicio, horario_fim)
         VALUES (
           ${professorId}::uuid,
           ${turmaId}::uuid,
-          ${cronogramaId ? `${cronogramaId}::uuid` : null},
+          ${cronogramaId ?? null}::uuid,
           ${dataAula}::date,
           ${horarioInicio}::time,
           ${horarioFim}::time
