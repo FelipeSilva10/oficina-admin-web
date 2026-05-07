@@ -168,3 +168,12 @@ export const TIPO_LABEL: Record<TipoAula, string> = {
   "REUNIÃO": "Reunião",
   AULA_SUBSTITUTA: "Substituta",
 };
+// Adicionar mustChangeSenha ao tipo UsuarioSessao em src/lib/types.ts
+// Substitua a interface existente por esta:
+
+export interface UsuarioSessao {
+  id:              string;
+  nome:            string;
+  role:            Role;
+  mustChangeSenha?: boolean; // sinaliza que o professor deve trocar a senha no próximo login
+}
