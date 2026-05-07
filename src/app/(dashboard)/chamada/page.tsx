@@ -545,7 +545,7 @@ function HistoricoTela({
         {historico.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <AlertCircle size={40} className="opacity-20 mb-2" />
-            <p className="text-sm">Nenhuma chamada registrada ainda.</p>
+            <p className="text-sm">Nenhuma chamada registrada.</p>
           </div>
         ) : (
           <table className="w-full text-sm">
