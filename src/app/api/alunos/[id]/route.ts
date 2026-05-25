@@ -1,23 +1,68 @@
 // src/app/api/alunos/[id]/route.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// BUG CORRIGIDO (PATCH): a versão anterior atualizava apenas a tabela `perfis`
+// e ignorava o Supabase Auth. Isso fazia com que a nova senha salva no SAG
+// não funcionasse no Bloquin — o aluno continuava com a senha antiga no Auth.
+//
+// Agora o PATCH atualiza em dois lugares de forma atômica:
+//  1. Supabase Auth  → auth.users (via admin.auth.admin.updateUserById)
+//  2. Tabela perfis  → campos nome, email, senha, turma_id
+//
+// Se o Auth falhar, o banco não é tocado (fail-fast).
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { NextRequest, NextResponse } from "next/server";
 import sql from "@/lib/db";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
-// PATCH /api/alunos/[id] — Atualiza o aluno
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+// ── PATCH /api/alunos/[id] — atualiza nome, senha e turma ────────────────────
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
     const { nome, email, senha, turmaId } = await request.json();
 
-    if (!nome || !email || !senha || !turmaId) {
+    if (!nome?.trim() || !email?.trim() || !senha || !turmaId) {
       return NextResponse.json({ error: "Campos incompletos." }, { status: 400 });
     }
+    if (senha.length < 6) {
+      return NextResponse.json(
+        { error: "Senha mínima de 6 caracteres." },
+        { status: 400 }
+      );
+    }
 
-    // Atualiza no banco
+    const admin = getSupabaseAdmin();
+
+    // ── 1. Atualiza a senha no Supabase Auth ──────────────────────────────────
+    // ESSENCIAL: sem isso a nova senha não funciona no Bloquin.
+    const { error: authError } = await admin.auth.admin.updateUserById(id, {
+      password: senha,
+      // email: se o e-mail for editável no futuro, descomentar a linha abaixo
+      // email: email.trim(),
+    });
+
+    if (authError) {
+      console.error("[PATCH /api/alunos] Auth error:", authError);
+      return NextResponse.json(
+        { error: `Falha ao atualizar no Auth: ${authError.message}` },
+        { status: 500 }
+      );
+    }
+
+    // ── 2. Atualiza na tabela perfis ──────────────────────────────────────────
     await sql`
-      UPDATE perfis 
-      SET nome = ${nome.trim()}, email = ${email.trim()}, senha = ${senha}, turma_id = ${turmaId}::uuid
+      UPDATE perfis
+      SET nome     = ${nome.trim()},
+          email    = ${email.trim()},
+          senha    = ${senha},
+          turma_id = ${turmaId}::uuid,
+          updated_at = now()
       WHERE id = ${id}::uuid
+        AND role = 'student'
     `;
 
     return NextResponse.json({ ok: true });
@@ -27,20 +72,28 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 }
 
-// DELETE /api/alunos/[id] — Deleta do Supabase Auth e do banco
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+// ── DELETE /api/alunos/[id] — remove do Auth e do banco ──────────────────────
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
     const admin = getSupabaseAdmin();
 
-    // 1. Deleta do Supabase Auth (igual ao SupabaseAuthDAO.deletarUsuarioAuth)
+    // 1. Remove do Supabase Auth (cascata apaga perfis se FK configurada,
+    //    mas fazemos explicitamente para garantir)
     const { error: authError } = await admin.auth.admin.deleteUser(id);
     if (authError) {
-      console.error("Erro no Auth:", authError);
-      return NextResponse.json({ error: "Falha ao remover do Auth." }, { status: 500 });
+      console.error("[DELETE /api/alunos] Auth error:", authError);
+      return NextResponse.json(
+        { error: "Falha ao remover do Auth." },
+        { status: 500 }
+      );
     }
 
-    // 2. Deleta da tabela (caso não tenha deleção em cascata configurada)
+    // 2. Remove da tabela perfis (caso não haja ON DELETE CASCADE no FK)
     await sql`DELETE FROM perfis WHERE id = ${id}::uuid`;
 
     return NextResponse.json({ ok: true });

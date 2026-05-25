@@ -1,21 +1,17 @@
+// src/app/api/auth/login/route.ts
 // ─────────────────────────────────────────────────────────────────────────────
-// API route: POST /api/auth/login
-// Equivalente ao AutenticacaoDAO.java
+// Estratégia de autenticação:
+//  1. Tenta Admin     → tabela backoffice_admins (campo `login`)
+//  2. Tenta Professor → tabela perfis, role='teacher' (campo `email`)
 //
-// Estratégia:
-//  1. Tenta autenticar como Admin (tabela backoffice_admins)
-//  2. Se não encontrar, tenta como Professor (tabela perfis, role='teacher')
-//     — aceita tanto o campo `email` quanto o campo `login`
-//     — verifica access_status = 'ATIVO'
-//     — verifica temp_senha se a senha padrão não bater
-//     — sinaliza must_change_senha no payload de sessão
+// BUG CORRIGIDO: a query anterior usava `OR login = ...` na tabela perfis,
+// mas essa tabela não possui coluna `login` — apenas `email`.
+// Isso causava um erro SQL em todo login de professor.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { NextRequest, NextResponse } from "next/server";
 import sql from "@/lib/db";
 import type { UsuarioSessao } from "@/lib/types";
-
-// ── Tipos internos ────────────────────────────────────────────────────────────
 
 interface ProfRow {
   id: string;
@@ -40,42 +36,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const loginNorm = login.trim();
+    const loginNorm = login.trim().toLowerCase();
     let sessao: UsuarioSessao | null = null;
 
-    // ── 1. Tenta Admin ────────────────────────────────────────────────────────
+    // ── 1. Tenta Admin (backoffice_admins.login) ──────────────────────────────
     const adminRows = await sql`
       SELECT id, nome
       FROM backoffice_admins
-      WHERE login = ${loginNorm}
+      WHERE LOWER(login) = ${loginNorm}
         AND senha = ${senha}
       LIMIT 1
     `;
 
     if (adminRows.length > 0) {
       sessao = {
-        id:    adminRows[0].id as string,
-        nome:  adminRows[0].nome as string,
-        role:  "ADMIN",
+        id:   adminRows[0].id as string,
+        nome: adminRows[0].nome as string,
+        role: "ADMIN",
       };
     }
 
-    // ── 2. Tenta Professor ────────────────────────────────────────────────────
+    // ── 2. Tenta Professor (perfis.email) ─────────────────────────────────────
+    // A tabela `perfis` NÃO possui coluna `login` — apenas `email`.
+    // O professor digita o e-mail completo ou só o prefixo; aqui buscamos
+    // pelo e-mail exato para evitar ambiguidades.
     if (!sessao) {
-      // Aceita email OU o campo login (único), e já traz os campos de controle
       const profRows = await sql`
         SELECT id, nome, senha, access_status,
                must_change_senha, temp_senha, temp_senha_expiry
         FROM perfis
         WHERE role = 'teacher'
-          AND (email = ${loginNorm} OR login = ${loginNorm})
+          AND LOWER(email) = ${loginNorm}
         LIMIT 1
       `;
 
       if (profRows.length > 0) {
         const prof = profRows[0] as ProfRow;
 
-        // 2a. Verifica bloqueio/suspensão
+        // Verifica bloqueio / suspensão
         if (prof.access_status !== "ATIVO") {
           return NextResponse.json(
             { error: "Conta suspensa ou bloqueada. Contate o administrador." },
@@ -83,10 +81,10 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // 2b. Compara senha — tenta senha normal primeiro, depois temp_senha
-        const senhaOk      = prof.senha === senha;
-        const agora        = new Date();
-        const tempValida   =
+        // Compara senha — tenta senha normal primeiro, depois temp_senha
+        const senhaOk = prof.senha === senha;
+        const agora   = new Date();
+        const tempValida =
           prof.temp_senha !== null &&
           prof.temp_senha === senha &&
           prof.temp_senha_expiry !== null &&
@@ -99,7 +97,6 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // 2c. Monta sessão — sinaliza troca obrigatória de senha
         sessao = {
           id:              prof.id,
           nome:            prof.nome,
@@ -129,7 +126,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("[auth/login]", error);
+    console.error("[auth/login POST]", error);
     return NextResponse.json(
       { error: "Erro de conexão com o banco de dados." },
       { status: 500 }
