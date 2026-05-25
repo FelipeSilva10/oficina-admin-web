@@ -1,7 +1,10 @@
 import postgres from "postgres";
+import { setDefaultResultOrder } from "dns";
+
+// Força IPv4 — evita ENETUNREACH em redes sem IPv6
+setDefaultResultOrder("ipv4first");
 
 declare global {
-  // eslint-disable-next-line no-var
   var _sql: ReturnType<typeof postgres> | undefined;
 }
 
