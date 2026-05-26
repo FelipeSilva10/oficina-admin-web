@@ -1,35 +1,102 @@
+import * as React from "react";
+import { ChevronDown } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string;
-  error?: string;
-  options: { value: string; label: string }[];
-  placeholder?: string;
+interface SelectOption {
+  value: string;
+  label: string;
 }
 
-export default function Select({ label, error, options, placeholder, className, ...props }: SelectProps) {
+interface SelectProps
+  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string;
+  error?: string;
+  placeholder?: string;
+  options: SelectOption[];
+}
+
+export function Select({
+  label,
+  error,
+  placeholder,
+  options,
+  className,
+  id,
+  disabled,
+  ...props
+}: SelectProps) {
+  const generatedId = React.useId();
+
+  const selectId =
+    id ??
+    label?.toLowerCase().replace(/\s+/g, "-") ??
+    generatedId;
+
+  const errorId = `${selectId}-error`;
+
   return (
     <div className="space-y-1.5">
       {label && (
-        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide">
+        <label
+          htmlFor={selectId}
+          className="block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300"
+        >
           {label}
         </label>
       )}
-      <select
-        className={cn(
-          "w-full px-3 py-2 text-sm border rounded-lg bg-white transition",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-          error ? "border-red-400" : "border-gray-200",
-          className
-        )}
-        {...props}
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-      </select>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+
+      <div className="relative">
+        <select
+          id={selectId}
+          disabled={disabled}
+          aria-invalid={!!error}
+          aria-describedby={error ? errorId : undefined}
+          className={cn(
+            "w-full rounded-xl border bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900",
+            "appearance-none transition-colors duration-200",
+            "focus:outline-none focus:ring-2",
+            "dark:bg-slate-900 dark:text-slate-100",
+
+            error
+              ? "border-red-400 focus:border-red-400 focus:ring-red-400/30"
+              : "border-slate-200 hover:border-slate-300 focus:border-blue-400 focus:ring-blue-500/30 dark:border-slate-700 dark:hover:border-slate-600",
+
+            disabled &&
+              "cursor-not-allowed bg-slate-50 text-slate-400 dark:bg-slate-800",
+
+            className
+          )}
+          {...props}
+        >
+          {placeholder && (
+            <option value="" disabled hidden>
+              {placeholder}
+            </option>
+          )}
+
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+
+        <ChevronDown
+          size={16}
+          aria-hidden="true"
+          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+        />
+      </div>
+
+      {error && (
+        <p
+          id={errorId}
+          className="text-xs text-red-600 dark:text-red-400"
+        >
+          ⚠ {error}
+        </p>
+      )}
     </div>
   );
 }

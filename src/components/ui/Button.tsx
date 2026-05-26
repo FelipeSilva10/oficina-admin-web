@@ -1,44 +1,63 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// components/ui/Button.tsx — improved
+// ─────────────────────────────────────────────────────────────────────────────
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "ghost" | "purple";
-  size?: "sm" | "md" | "lg";
+  variant?: "primary" | "secondary" | "danger" | "ghost" | "purple" | "success";
+  size?: "xs" | "sm" | "md" | "lg";
   loading?: boolean;
+  fullWidth?: boolean;
 }
 
 export default function Button({
   variant = "primary",
   size = "md",
   loading,
+  fullWidth,
   className,
   children,
   disabled,
   ...props
 }: ButtonProps) {
-  const base = "inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed";
+  const base = [
+    "inline-flex items-center justify-center gap-2 font-semibold rounded-xl",
+    "transition-all duration-150 active:scale-[0.97]",
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100",
+    "select-none",
+  ].join(" ");
 
   const variants = {
-    primary:   "bg-blue-600 hover:bg-blue-700 text-white",
-    secondary: "bg-gray-100 hover:bg-gray-200 text-gray-800",
-    danger:    "bg-red-600 hover:bg-red-700 text-white",
-    ghost:     "bg-transparent hover:bg-gray-100 text-gray-600",
-    purple:    "bg-purple-600 hover:bg-purple-700 text-white", 
+    primary:   "bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-500/20 focus-visible:ring-blue-500",
+    secondary: "bg-slate-100 hover:bg-slate-200 text-slate-700 focus-visible:ring-slate-400",
+    danger:    "bg-red-600 hover:bg-red-700 text-white shadow-sm shadow-red-500/20 focus-visible:ring-red-500",
+    ghost:     "bg-transparent hover:bg-slate-100 text-slate-600 focus-visible:ring-slate-400",
+    purple:    "bg-violet-600 hover:bg-violet-700 text-white shadow-sm shadow-violet-500/20 focus-visible:ring-violet-500",
+    success:   "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-500/20 focus-visible:ring-emerald-500",
   };
 
   const sizes = {
-    sm: "text-xs px-3 py-1.5",
-    md: "text-sm px-4 py-2",
-    lg: "text-sm px-5 py-2.5",
+    xs: "text-[11px] px-2.5 py-1.5 h-7",
+    sm: "text-xs px-3 py-2 h-8",
+    md: "text-sm px-4 py-2.5 h-10 min-h-[40px]",
+    lg: "text-sm px-5 py-3 h-11 min-h-[44px]",
   };
 
   return (
     <button
       disabled={disabled || loading}
-      className={cn(base, variants[variant], sizes[size], className)}
+      className={cn(
+        base,
+        variants[variant],
+        sizes[size],
+        fullWidth && "w-full",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+        className
+      )}
       {...props}
     >
-      {loading && <Loader2 size={14} className="animate-spin" />}
+      {loading && <Loader2 size={13} className="animate-spin flex-none" />}
       {children}
     </button>
   );
