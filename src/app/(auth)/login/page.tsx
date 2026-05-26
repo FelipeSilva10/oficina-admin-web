@@ -36,7 +36,7 @@ export default function LoginPage() {
 
       setSessao(data.sessao);
       const next = new URLSearchParams(window.location.search).get("next");
-      router.push(next ?? "/escolas");
+      router.push(next ?? "/dashboard");
     } catch {
       toast.error("Erro de conexão. Verifique a rede.");
     } finally {
@@ -86,7 +86,7 @@ export default function LoginPage() {
             <div>
               <span className="text-white font-bold text-lg">SAG</span>
               <p className="text-slate-500 text-[11px] font-medium leading-tight">
-                Oficina do Amanhã
+                Bloquin
               </p>
             </div>
           </div>

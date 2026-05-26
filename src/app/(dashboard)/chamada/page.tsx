@@ -244,8 +244,8 @@ export default function ChamadaPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Sub-header com tabs */}
-      <div className="flex items-center gap-2 px-6 py-3 bg-white border-b border-gray-200">
-        <h1 className="text-lg font-bold text-gray-900 mr-4">Chamada</h1>
+      <div className="flex flex-wrap items-center gap-2 px-4 py-3 bg-white border-b border-gray-200 sm:px-6">
+        <h1 className="mr-2 text-lg font-bold text-gray-900 sm:mr-4">Chamada</h1>
 
         {(["PREVIEW", "HISTORICO"] as Tela[]).map((t) => (
           <button
@@ -261,7 +261,7 @@ export default function ChamadaPage() {
           </button>
         ))}
 
-        <div className="flex-1" />
+        <div className="hidden sm:block sm:flex-1" />
 
         <button
           onClick={() => { if (tela === "PREVIEW") carregarPreview(); else carregarHistorico(); }}
@@ -270,7 +270,7 @@ export default function ChamadaPage() {
           <RefreshCw size={15} />
         </button>
 
-        <Button onClick={() => abrirFormManual()} size="md">
+        <Button onClick={() => abrirFormManual()} size="md" className="w-full sm:w-auto">
           <Plus size={14} /> Nova Chamada
         </Button>
       </div>
@@ -341,10 +341,10 @@ function PreviewTela({
   onIniciarTurma: (id: string) => void;
 }) {
   return (
-    <div className="flex-1 overflow-auto p-6 space-y-6">
+    <div className="flex-1 overflow-auto p-4 space-y-6 sm:p-6">
       {/* Banner aula ativa */}
       {slotAtual && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
+        <div className="flex flex-col gap-3 rounded-lg border border-green-200 bg-green-50 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <div>
@@ -372,7 +372,7 @@ function PreviewTela({
             const pct = r.mediaPresenca ?? 0;
             return (
               <div key={r.turmaId}
-                className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
+                className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm space-y-3">
                 <div>
                   <p className="font-bold text-gray-900">{r.turmaNome}</p>
                   <p className="text-xs text-gray-500">{r.escolaNome}</p>
@@ -431,8 +431,8 @@ function FormTela({
       </div>
 
       {/* Seletor */}
-      <div className="flex items-end gap-3 px-6 py-3 bg-gray-50 border-b border-gray-200 flex-wrap">
-        <div className="w-56">
+      <div className="flex flex-col gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 sm:flex-row sm:items-end sm:flex-wrap sm:px-6">
+        <div className="w-full sm:w-56">
           <Select
             label="Turma"
             value={turmaId}
@@ -443,7 +443,7 @@ function FormTela({
             ]}
           />
         </div>
-        <div>
+        <div className="w-full sm:w-auto">
           <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1.5">
             Data
           </label>
@@ -451,10 +451,10 @@ function FormTela({
             type="date"
             value={data}
             onChange={(e) => setData(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-10 w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-auto"
           />
         </div>
-        <Button onClick={onCarregar} variant="secondary" disabled={!turmaId || !data}>
+        <Button onClick={onCarregar} variant="secondary" disabled={!turmaId || !data} className="w-full sm:w-auto">
           Carregar Alunos
         </Button>
 
@@ -512,18 +512,18 @@ function FormTela({
 
       {/* Rodapé */}
       {presencas.length > 0 && (
-        <div className="border-t border-gray-200 px-6 py-3 bg-white flex items-center gap-4">
+        <div className="border-t border-gray-200 px-4 py-3 bg-white flex flex-col gap-3 sm:flex-row sm:items-center sm:px-6">
           <button onClick={onTodos} className="text-xs text-blue-600 hover:underline font-medium">
             Todos presentes
           </button>
           <button onClick={onNenhum} className="text-xs text-gray-500 hover:underline font-medium">
             Todos ausentes
           </button>
-          <span className="text-xs text-gray-500 ml-auto">
+          <span className="text-xs text-gray-500 sm:ml-auto">
             Presentes: <strong>{presentes}</strong> / {presencas.length}
             {" · "}Ausentes: <strong>{ausentes}</strong>
           </span>
-          <Button onClick={onSalvar} loading={saving} className="bg-green-600 hover:bg-green-700 text-white">
+          <Button onClick={onSalvar} loading={saving} className="w-full bg-green-600 hover:bg-green-700 text-white sm:w-auto">
             Salvar Chamada
           </Button>
         </div>
@@ -539,7 +539,7 @@ function HistoricoTela({
   const presentes = presencasDetalhe.filter((p: ChamadaPresenca) => p.presente).length;
 
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
       {/* Lista */}
       <div className="flex-1 overflow-auto">
         {historico.length === 0 ? (
@@ -597,7 +597,7 @@ function HistoricoTela({
 
       {/* Painel de detalhe */}
       {detalhe && (
-        <div className="w-80 flex-none flex flex-col bg-white border-l border-gray-200">
+        <div className="max-h-[50vh] w-full flex-none flex flex-col bg-white border-t border-gray-200 lg:max-h-none lg:w-80 lg:border-l lg:border-t-0">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
             <div>
               <p className="text-sm font-bold text-gray-900">

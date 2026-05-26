@@ -255,7 +255,7 @@ export default function CronogramaPage() {
     <div className="flex h-full">
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-3 px-6 py-4 bg-white border-b border-gray-200 flex-wrap gap-y-2">
+        <div className="flex flex-col gap-3 px-4 py-4 bg-white border-b border-gray-200 sm:flex-row sm:items-center sm:flex-wrap sm:px-6">
           <div>
             <h1 className="text-lg font-bold text-gray-900">Cronograma</h1>
             {!admin && (
@@ -266,7 +266,7 @@ export default function CronogramaPage() {
           </div>
 
           {admin && (
-            <div className="w-56">
+            <div className="w-full sm:w-56">
               <Select
                 value={filtroProfId}
                 onChange={(e) => setFiltroProfId(e.target.value)}
@@ -278,7 +278,7 @@ export default function CronogramaPage() {
             </div>
           )}
 
-          <div className="flex-1" />
+          <div className="hidden sm:block sm:flex-1" />
 
           <button
             onClick={carregar}
@@ -288,7 +288,7 @@ export default function CronogramaPage() {
             <RefreshCw size={15} />
           </button>
 
-          <Button onClick={abrirNovo} size="md">
+          <Button onClick={abrirNovo} size="md" className="w-full sm:w-auto">
             <Plus size={14} />
             {admin ? "Novo Horário" : "Reunião / Substituta"}
           </Button>
@@ -297,14 +297,14 @@ export default function CronogramaPage() {
         {loading ? (
           <Spinner />
         ) : (
-          <div className="flex-1 overflow-auto p-6 space-y-6">
+          <div className="flex-1 overflow-auto p-4 space-y-6 sm:p-6">
             {/* Grade semanal (visão professor) */}
             {!admin && (
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
                   Visão Semanal
                 </p>
-                <div className="grid grid-cols-6 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                   {DIAS_SEMANA.map((dia) => (
                     <div key={dia}>
                       <div className="text-center py-2 text-xs font-bold text-white rounded-t-lg bg-gray-800">

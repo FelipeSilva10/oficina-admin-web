@@ -9,7 +9,7 @@ import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "SAG — Sistema de Aulas e Gestão",
-  description: "Plataforma de gestão escolar — Oficina do Amanhã",
+  description: "Plataforma de gestão escolar do Bloquin",
 };
 
 export default function RootLayout({

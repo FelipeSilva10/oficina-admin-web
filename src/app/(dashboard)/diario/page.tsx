@@ -149,7 +149,7 @@ export default function DiarioPage() {
     <div className="flex h-full">
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-3 px-6 py-4 bg-white border-b border-gray-200 flex-wrap gap-y-2">
+        <div className="flex flex-col gap-3 px-4 py-4 bg-white border-b border-gray-200 sm:flex-row sm:items-center sm:flex-wrap sm:px-6">
           <div>
             <h1 className="text-lg font-bold text-gray-900">Diário de Aulas</h1>
             <p className="text-xs text-gray-400 mt-0.5">
@@ -157,7 +157,7 @@ export default function DiarioPage() {
             </p>
           </div>
 
-          <div className="w-48">
+          <div className="w-full sm:w-48">
             <Select
               value={filtroTurmaId}
               onChange={(e) => setFiltroTurmaId(e.target.value)}
@@ -168,17 +168,17 @@ export default function DiarioPage() {
             />
           </div>
 
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar título, conteúdo..."
-              className="pl-8 pr-4 py-2 text-sm border border-gray-200 rounded-lg w-52 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full pl-8 pr-4 py-2 text-sm border border-gray-200 rounded-lg sm:w-56 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             />
           </div>
 
-          <div className="flex-1" />
+          <div className="hidden sm:block sm:flex-1" />
 
           <button
             onClick={carregar}
@@ -187,7 +187,7 @@ export default function DiarioPage() {
             <RefreshCw size={15} />
           </button>
 
-          <Button onClick={abrirNovo} size="md">
+          <Button onClick={abrirNovo} size="md" className="w-full sm:w-auto">
             <Plus size={14} /> Nova Entrada
           </Button>
         </div>

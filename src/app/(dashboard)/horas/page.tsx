@@ -158,15 +158,15 @@ export default function HorasPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-4 bg-white border-b border-gray-200 flex-wrap gap-y-2">
+      <div className="flex flex-col gap-3 px-4 py-4 bg-white border-b border-gray-200 sm:flex-row sm:items-center sm:flex-wrap sm:px-6">
         <h1 className="text-lg font-bold text-gray-900">
           {admin ? "Registro de Horas — Administração" : "Meu Registro de Horas"}
         </h1>
 
-        <div className="flex-1" />
+        <div className="hidden sm:block sm:flex-1" />
 
         {admin && (
-          <div className="w-48">
+          <div className="w-full sm:w-48">
             <Select
               value={profFiltro}
               onChange={(e) => setProfFiltro(e.target.value)}
@@ -178,7 +178,7 @@ export default function HorasPage() {
           </div>
         )}
 
-        <div className="w-36">
+        <div className="w-full sm:w-36">
           <Select
             value={mes}
             onChange={(e) => setMes(e.target.value)}
@@ -189,7 +189,7 @@ export default function HorasPage() {
           />
         </div>
 
-        <div className="w-24">
+        <div className="w-full sm:w-24">
           <Select
             value={ano}
             onChange={(e) => setAno(e.target.value)}
@@ -207,7 +207,7 @@ export default function HorasPage() {
         <button
           onClick={exportarCSV}
           disabled={listaExibida.length === 0}
-          className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 transition"
+          className="flex w-full items-center justify-center gap-1.5 px-3 py-2 text-sm font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 transition sm:w-auto"
         >
           <Download size={14} />
           Exportar CSV
@@ -215,7 +215,7 @@ export default function HorasPage() {
       </div>
 
       {/* Cards de totais */}
-      <div className="grid grid-cols-3 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <div className="grid grid-cols-1 gap-3 px-4 py-4 bg-gray-50 border-b border-gray-200 sm:grid-cols-3 sm:px-6">
         <Card
           titulo="Total de Aulas"
           valor={String(listaExibida.length)}
@@ -240,10 +240,10 @@ export default function HorasPage() {
       {loading ? (
         <Spinner />
       ) : (
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
           {/* Resumo por professor (admin) */}
           {admin && (
-            <div className="w-72 flex-none border-r border-gray-200 overflow-auto">
+            <div className="max-h-72 w-full flex-none overflow-auto border-b border-gray-200 lg:max-h-none lg:w-72 lg:border-b-0 lg:border-r">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
                 <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">
                   Resumo por Professor

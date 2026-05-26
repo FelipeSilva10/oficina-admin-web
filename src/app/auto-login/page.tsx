@@ -47,7 +47,7 @@ function AutoLoginContent() {
         return;
       }
 
-      router.replace("/escolas");
+      router.replace("/dashboard");
     };
 
     run();

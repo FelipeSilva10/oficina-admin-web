@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Inbox } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -13,7 +14,7 @@ interface EmptyStateProps {
 
 export function EmptyState({
   icon,
-  emoji = "📭",
+  emoji,
   title = "Nenhum registro",
   message,
   action,
@@ -32,12 +33,12 @@ export function EmptyState({
       <div
         aria-hidden="true"
         className={cn(
-          "mb-4 flex h-14 w-14 items-center justify-center",
-          "rounded-2xl bg-slate-100 text-2xl",
+          "mb-4 flex h-12 w-12 items-center justify-center",
+          "rounded-lg bg-slate-100 text-slate-400",
           "dark:bg-slate-800"
         )}
       >
-        {icon ?? <span>{emoji}</span>}
+        {icon ?? (emoji ? <span className="text-2xl">{emoji}</span> : <Inbox size={22} />)}
       </div>
 
       <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">

@@ -2,8 +2,8 @@
 // middleware.ts — equivalente ao controle de acesso do MainFX.java
 //
 // Regras:
-//  - / e /login → públicas
-//  - /dashboard/** → requer sessão ativa (cookie)
+//  - /login e /api/auth/login → públicas
+//  - rotas do app → requerem sessão ativa (cookie)
 //  - Redireciona para /login se não autenticado
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -25,15 +25,15 @@ export default function Table<T extends Record<string, unknown>>({
   rowClassName,
 }: TableProps<T>) {
   return (
-    <div className="overflow-auto">
-      <table className="w-full text-sm">
+    <div className="overflow-auto rounded-lg border border-slate-200 bg-white">
+      <table className="w-full min-w-[680px] text-sm">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
+          <tr className="border-b border-slate-200 bg-slate-50">
             {columns.map((col) => (
               <th
                 key={col.key}
                 className={cn(
-                  "px-4 py-2.5 text-left text-xs font-bold text-gray-500 uppercase tracking-wide",
+                  "sticky top-0 z-10 px-4 py-2.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wide",
                   col.width
                 )}
               >
@@ -47,7 +47,7 @@ export default function Table<T extends Record<string, unknown>>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="px-4 py-10 text-center text-sm text-gray-400"
+                className="px-4 py-10 text-center text-sm text-slate-400"
               >
                 {emptyMessage}
               </td>
@@ -58,13 +58,13 @@ export default function Table<T extends Record<string, unknown>>({
                 key={rowKey(row)}
                 onClick={() => onRowClick?.(row)}
                 className={cn(
-                  "border-b border-gray-100 transition",
-                  onRowClick && "cursor-pointer hover:bg-blue-50",
+                  "border-b border-slate-100 transition-colors last:border-0",
+                  onRowClick && "cursor-pointer hover:bg-blue-50/70",
                   rowClassName?.(row)
                 )}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-3 text-gray-700">
+                  <td key={col.key} className="px-4 py-3 text-slate-700">
                     {col.render
                       ? col.render(row)
                       : String(row[col.key] ?? "—")}

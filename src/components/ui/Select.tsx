@@ -28,10 +28,7 @@ export function Select({
 }: SelectProps) {
   const generatedId = React.useId();
 
-  const selectId =
-    id ??
-    label?.toLowerCase().replace(/\s+/g, "-") ??
-    generatedId;
+  const selectId = id ?? generatedId;
 
   const errorId = `${selectId}-error`;
 
@@ -53,7 +50,7 @@ export function Select({
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            "w-full rounded-xl border bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900",
+            "h-10 w-full rounded-lg border bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900",
             "appearance-none transition-colors duration-200",
             "focus:outline-none focus:ring-2",
             "dark:bg-slate-900 dark:text-slate-100",

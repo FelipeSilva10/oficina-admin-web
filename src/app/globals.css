@@ -150,6 +150,34 @@
   }
 }
 
+/* ── App Shell ───────────────────────────────────────────────────────────── */
+@layer components {
+  .sag-main table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .sag-main thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  .sag-main aside thead th {
+    position: static;
+  }
+
+  @media (max-width: 767px) {
+    .sag-main table {
+      min-width: 680px;
+    }
+
+    .sag-main aside table {
+      min-width: 100%;
+    }
+  }
+}
+
 /* ── Motion Safety ───────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,

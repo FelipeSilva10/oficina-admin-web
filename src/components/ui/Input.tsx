@@ -1,4 +1,5 @@
 // components/ui/Input.tsx — improved
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -19,7 +20,17 @@ export default function Input({
   id,
   ...props
 }: InputProps) {
-  const inputId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
+  const generatedId = React.useId();
+  const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
+  const hintId = `${inputId}-hint`;
+  const describedBy =
+    [
+      error ? errorId : null,
+      hint && !error ? hintId : null,
+    ]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
     <div className="space-y-1.5">
@@ -40,9 +51,11 @@ export default function Input({
         )}
         <input
           id={inputId}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
           className={cn(
-            "w-full py-2.5 border rounded-xl bg-white text-slate-900 text-sm",
-            "placeholder-slate-400 transition-all duration-150",
+            "h-10 w-full rounded-lg border bg-white py-2.5 text-sm text-slate-900",
+            "placeholder-slate-400 transition-colors duration-150",
             "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400",
             "disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed",
             error
@@ -62,12 +75,12 @@ export default function Input({
       </div>
 
       {error && (
-        <p className="text-xs text-red-600 flex items-center gap-1">
+        <p id={errorId} className="text-xs text-red-600 flex items-center gap-1">
           <span className="text-red-500">⚠</span> {error}
         </p>
       )}
       {hint && !error && (
-        <p className="text-xs text-slate-400">{hint}</p>
+        <p id={hintId} className="text-xs text-slate-400">{hint}</p>
       )}
     </div>
   );
