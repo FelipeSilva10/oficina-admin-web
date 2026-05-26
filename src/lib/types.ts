@@ -1,16 +1,15 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // tipos.ts — equivalente TypeScript de todo o pacote core/ do Java
-// Mantém os mesmos nomes de campo snake_case do banco +
-// aliases camelCase para uso no frontend.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── Sessão ────────────────────────────────────────────────────────────────────
 export type Role = "ADMIN" | "TEACHER";
 
 export interface UsuarioSessao {
-  id: string;
-  nome: string;
-  role: Role;
+  id:              string;
+  nome:            string;
+  role:            Role;
+  mustChangeSenha?: boolean; // sinaliza que o professor deve trocar a senha no próximo login
 }
 
 // ── Escola ─────────────────────────────────────────────────────────────────────
@@ -74,7 +73,7 @@ export interface CronogramaAula {
   criadoPor: CriadoPor;
 }
 
-// Agrupamento de dias da mesma aula (equivale ao GrupoCronograma.java)
+// Agrupamento de dias da mesma aula
 export interface GrupoCronograma {
   ids: string[];
   professorId: string;
@@ -92,7 +91,7 @@ export interface GrupoCronograma {
 
 // ── Chamada ────────────────────────────────────────────────────────────────────
 export interface ChamadaPresenca {
-  id: string | null;    // null antes de persistir
+  id: string | null;
   chamadaId: string | null;
   alunoId: string;
   alunoNome: string;
@@ -105,7 +104,7 @@ export interface Chamada {
   turmaId: string;
   turmaNome: string;
   cronogramaId: string | null;
-  dataAula: string;       // ISO date
+  dataAula: string;
   horarioInicio: string;
   horarioFim: string;
   totalAlunos: number;
@@ -117,8 +116,8 @@ export interface ResumoTurma {
   turmaNome: string;
   escolaNome: string;
   totalChamadas: number;
-  mediaPresenca: number; // 0-100
-  ultimaChamada: string | null; // ISO date
+  mediaPresenca: number;
+  ultimaChamada: string | null;
 }
 
 // ── Diário de Aulas ────────────────────────────────────────────────────────────
@@ -128,7 +127,7 @@ export interface DiarioAula {
   turmaId: string;
   turmaNome: string;
   escolaNome: string;
-  dataAula: string; // ISO date
+  dataAula: string;
   titulo: string;
   conteudo: string;
   observacoes: string;
@@ -143,7 +142,7 @@ export interface RegistroHoras {
   turmaNome: string;
   escolaNome: string;
   escolaTipo: EscolaTipo;
-  dataAula: string;       // ISO date
+  dataAula: string;
   horarioInicio: string;
   horarioFim: string;
   tipoAula: TipoAula;
@@ -159,21 +158,12 @@ export const DIAS_SEMANA: DiaSemana[] = [
 ];
 
 export const ABREV_DIA: Record<DiaSemana, string> = {
-  SEGUNDA: "Seg", "TERÇA": "Ter", QUARTA: "Qua",
-  QUINTA: "Qui", SEXTA: "Sex", "SÁBADO": "Sáb", DOMINGO: "Dom",
+  SEGUNDA: "Seg", TERÇA: "Ter", QUARTA: "Qua",
+  QUINTA: "Qui", SEXTA: "Sex", SÁBADO: "Sáb", DOMINGO: "Dom",
 };
 
 export const TIPO_LABEL: Record<TipoAula, string> = {
   AULA: "Aula",
-  "REUNIÃO": "Reunião",
+  REUNIÃO: "Reunião",
   AULA_SUBSTITUTA: "Substituta",
 };
-// Adicionar mustChangeSenha ao tipo UsuarioSessao em src/lib/types.ts
-// Substitua a interface existente por esta:
-
-export interface UsuarioSessao {
-  id:              string;
-  nome:            string;
-  role:            Role;
-  mustChangeSenha?: boolean; // sinaliza que o professor deve trocar a senha no próximo login
-}
